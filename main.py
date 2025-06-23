@@ -38,6 +38,11 @@ class UserResponse(BaseModel):
     login: str
     password: str
 
+class CarParkCreate(BaseModel):
+    state_number: str
+    model: str
+    stamp: str
+
 class UserCreate(BaseModel):
     name: str
     surname: str
@@ -545,3 +550,11 @@ async def delete_car(car_id: int, db: Session = Depends(get_db)):
 async def get_all_user_cars(db: Session = Depends(get_db)):
     user_cars = db.query(UserCar).all()
     return user_cars
+
+@app.post("/car_parks/")
+async def create_car_park(car_park: CarParkCreate, db: Session = Depends(get_db)):
+    db_car = CarPark(**car_park.dict())
+    db.add(db_car)
+    db.commit()
+    db.refresh(db_car)
+    return db_car
